@@ -6,6 +6,27 @@ BUILD_DIR=${1:-}
 CACHE_DIR=${2:-}
 ENV_DIR=${3:-}
 
+##
+# Load the SSH key from the environment.
+
+if [ ! -d ~/.ssh ]; then
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+fi
+
+base64 --decode $ENV_DIR/BUILDPACK_SSH_KEY > ~/.ssh/buildpack_key
+chmod 400 ~/.ssh/buildpack_key
+
+echo -e "Host github.com\n"\
+        "  IdentityFile ~/.ssh/buildpack_key\n"\
+        "  IdentitiesOnly yes\n"\
+        "  UserKnownHostsFile=/dev/null\n"\
+        "  StrictHostKeyChecking no"\
+        >> ~/.ssh/config
+
+##
+# Clone the repo and execute.
+
 tmpdir=$(mktemp --directory private-buildpack-XXXXXXXX)
 git clone git@github.com:back9ins/buildpack "${tmpdir}"
 cd "${tmpdir}"
