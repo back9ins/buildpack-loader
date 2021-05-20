@@ -2,5 +2,4 @@
 
 set -e
 
-echo "Buildpack"
-echo 0
+echo "back9ins/buildpack"
